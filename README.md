@@ -1,1 +1,1 @@
-## 动态加载删除依赖
+## tinyPIC plugin
