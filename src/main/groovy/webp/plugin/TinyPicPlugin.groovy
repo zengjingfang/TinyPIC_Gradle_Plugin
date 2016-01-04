@@ -41,13 +41,14 @@ class TinyPicPlugin implements Plugin<Project> {
                     }
 
                     def n = 0
-                    def totalSaveSize = 0
+                    def thisTimeTotalSaveSize = 0
+                    def lastAllTimesTotalSaveSize = 0
                     def compressedListFile = new File("${project.projectDir}/tinypic_compressed_list.txt")
-                    if(!compressedListFile.exists()){
+                    if (!compressedListFile.exists()) {
                         compressedListFile.createNewFile()
                     }
                     def whiteListFile = new File("${project.projectDir}/tinypic_white_list.txt")
-                    if(!whiteListFile.exists()){
+                    if (!whiteListFile.exists()) {
                         whiteListFile.createNewFile()
                     }
                     def ln = System.getProperty('line.separator')
@@ -83,6 +84,12 @@ class TinyPicPlugin implements Plugin<Project> {
 //                                    println " compressedList.each:" + it
                                     isInCompressedList = true
                                 }
+                                String str = it.toString()
+                                if (str.contains("all times totalSaveSize")) {
+                                    lastAllTimesTotalSaveSize = it.toString().subSequence(str.indexOf(":") + 1, str.indexOf("B"))
+//                                    println " lastTimeTotalSaveSize:" + lastAllTimesTotalSaveSize
+                                }
+
                             }
 
 
@@ -120,7 +127,7 @@ class TinyPicPlugin implements Plugin<Project> {
                                             def saveSize = beforeSize - afterSize
                                             println "saveSize:" + saveSize + "B"
 
-                                            totalSaveSize += saveSize
+                                            thisTimeTotalSaveSize += saveSize
 
                                             compressedListFile << "${fileName}${ln}"
 
@@ -148,8 +155,13 @@ class TinyPicPlugin implements Plugin<Project> {
 
                         }
                     }
-                    println "totalSaveSize>>>>>>>>>>>>>>>>>>>>>>" + totalSaveSize + "B"
-                    compressedListFile << ">>>>>>>>>>>>>>>>>>>>>>totalSaveSize>>>>>>>>>>>>>>>>>>>>>>${totalSaveSize}" + "B" + " ${ln}"
+                    def allTimesTotalSaveSize = thisTimeTotalSaveSize.toInteger() + lastAllTimesTotalSaveSize.toInteger()
+                    println "totalSaveSize>>>>>>>>>>>>>>>>>>>>>>" + thisTimeTotalSaveSize + "B"
+                    compressedListFile << ">>>>>>>>>lastAllTimesTotalSaveSize>>>>>>>>>>:${lastAllTimesTotalSaveSize}" + "B" + " ${ln}"
+                    compressedListFile << ">>>>>>>>>>>>>>this time totalSaveSize>>>>>>>>>>>>>>>:${thisTimeTotalSaveSize}" + "B" + " ${ln}"
+                    compressedListFile << ">>>>>>>>>>>>>>>>>>>all times totalSaveSize>>>>>>>>>>>>>>>>>>>>:${allTimesTotalSaveSize}" + "B" + " ${ln}"
+
+
                 }
 
                 //将自定义task放在dx task之前执行
