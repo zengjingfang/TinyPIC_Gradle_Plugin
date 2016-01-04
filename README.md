@@ -1,3 +1,9 @@
+## UpdateInfo
+### 1.1.3
+    添加如果本次压缩是0B  就不输出信息到文件里面去
+### 1.1.2
+    添加总减少大小统计
+
 各位亲们，你们还在手动添加一个个图片到tiny上压缩，下载吗？
 
 tinyPIC是一个批量tiny处理res图片的gradle插件，以后您尽管往res里放切好的图，tiny处理的工作就交给他好了。
@@ -6,7 +12,7 @@ tinyPIC是一个批量tiny处理res图片的gradle插件，以后您尽管往res
 
 在外层的build.gradle文件中（即与settings.gradle同级的文件）添加如下代码
 
- 	classpath 'com.mogujie.gradle:tinyPicPlugin:1.1.2'
+ 	classpath 'com.mogujie.gradle:tinyPicPlugin:1.1.3'
 在内层build.gradle文件中（即与src同级的文件）添加如下代码
 
  	apply plugin: 'webpConvert'

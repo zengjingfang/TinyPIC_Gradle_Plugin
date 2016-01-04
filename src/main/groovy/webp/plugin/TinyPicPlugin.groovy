@@ -155,6 +155,11 @@ class TinyPicPlugin implements Plugin<Project> {
 
                         }
                     }
+
+                    if (thisTimeTotalSaveSize.toInteger() == 0) {
+                        println "no need save"
+                        return
+                    }
                     def allTimesTotalSaveSize = thisTimeTotalSaveSize.toInteger() + lastAllTimesTotalSaveSize.toInteger()
                     println "totalSaveSize>>>>>>>>>>>>>>>>>>>>>>" + thisTimeTotalSaveSize + "B"
                     compressedListFile << ">>>>>>>>>lastAllTimesTotalSaveSize>>>>>>>>>>:${lastAllTimesTotalSaveSize}" + "B" + " ${ln}"

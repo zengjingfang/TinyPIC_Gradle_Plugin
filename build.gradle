@@ -34,7 +34,7 @@ dependencies {
 upinfo{
     groupId = 'com.mogujie.gradle'  
     artifactId = 'tinyPicPlugin'
-//    version = '1.1.27-SNAPSHOT'
-    version = '1.1.2'
+//    version = '1.1.30-SNAPSHOT'
+    version = '1.1.3'
 }
 
