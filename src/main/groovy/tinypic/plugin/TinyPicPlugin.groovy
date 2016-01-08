@@ -1,4 +1,4 @@
-package webp.plugin
+package tinypic.plugin
 
 import com.android.build.gradle.AppPlugin
 import com.tinify.*
