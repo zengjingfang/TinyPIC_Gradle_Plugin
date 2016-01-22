@@ -1,3 +1,14 @@
+/**
+ * Created by boyue
+ * Copyright (c) 2015-present, mogujie.
+ * All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
+
 package tinypic.plugin
 
 import com.android.build.gradle.AppPlugin
@@ -9,6 +20,7 @@ import java.lang.Exception
 
 class TinyPicPlugin implements Plugin<Project> {
 
+    TinyInfo tinyinfo;
 
     @Override
     void apply(Project project) {
@@ -17,16 +29,26 @@ class TinyPicPlugin implements Plugin<Project> {
 
         def variants = hasApp ? project.android.applicationVariants : project.android.libraryVariants
 
-        project.extensions.create("tinyinfo", TinyInfo)
+
+        tinyinfo = project.extensions.create("tinyinfo", TinyInfo);
         project.afterEvaluate {
             variants.all { variant ->
-                def dx = project.tasks.findByName("process${variant.name.capitalize()}Resources")
+
+
+                if (tinyinfo.skip == true) {
+                    printlog "skip tinyPicPlugin Task!!!!!!"
+
+                    return
+                }
+
+                def processResourceTask = project.tasks.findByName("process${variant.name.capitalize()}Resources")
                 def tinyPicPlugin = "tinyPicPlugin${variant.name.capitalize()}"
                 project.task(tinyPicPlugin) << {
 
-                    def apiKey = project.tinyinfo.apiKey
-                    println "tiny apiKey:" + apiKey
-//                    def maxNum = project.tinyinfo.maxNum
+                    def apiKey = tinyinfo.apiKey
+                    printlog "tiny apiKey:" + apiKey
+
+//                    def maxNum = tinyinfo.maxNum
 
 //                    println "tiny maxNum:" + maxNum
 //                    if (maxNum == null) {
@@ -56,7 +78,8 @@ class TinyPicPlugin implements Plugin<Project> {
                     def compressedList = new ArrayList()
                     compressedListFile.eachLine() {
                         compressedList.add(it)
-                        println "compressedList line:" + it
+                        printlog "compressedList line:" + it
+
                     }
 
 
@@ -64,16 +87,13 @@ class TinyPicPlugin implements Plugin<Project> {
                     String resPath = "${project.projectDir}/src/main/res/"
                     def dir = new File("${resPath}")
                     dir.eachDirMatch(~/drawable[a-z-]*/) { drawDir ->
-//                        println "drawableDir:" + drawDir
                         def file = new File("${drawDir}")
                         file.eachFile { filePathAndName ->
-//                            println "filename:" + filename
                             def fileName = filePathAndName.name
 
                             def isInWhiteList = false
                             def isInCompressedList = false
                             whiteListFile.eachLine { whiteName ->
-//                                println "find white list line: ${whiteName}"
                                 if (fileName.equals(whiteName)) {
                                     isInWhiteList = true
                                 }
@@ -81,13 +101,11 @@ class TinyPicPlugin implements Plugin<Project> {
 
                             compressedList.each {
                                 if (fileName.equals(it)) {
-//                                    println " compressedList.each:" + it
                                     isInCompressedList = true
                                 }
                                 String str = it.toString()
                                 if (str.contains("all times totalSaveSize")) {
                                     lastAllTimesTotalSaveSize = it.toString().subSequence(str.indexOf(":") + 1, str.indexOf("B"))
-//                                    println " lastTimeTotalSaveSize:" + lastAllTimesTotalSaveSize
                                 }
 
                             }
@@ -104,28 +122,32 @@ class TinyPicPlugin implements Plugin<Project> {
 //                                            }
 //                                        }
 
+                                        printlog "find target pic >>>>>>>>>>>>>" + fileName
 
-                                        println "find target pic >>>>>>>>>>>>>" + fileName
+
 
 
                                         def picName = fileName.split('\\.')[0]
                                         def suffix = fileName.split('\\.')[1]
-                                        println "picName:" + picName
+                                        printlog "picName:" + picName
+
                                         def targetFile = new File("${filePathAndName}")
                                         def fis = new FileInputStream(targetFile);
 
                                         try {
                                             def beforeSize = fis.available();
-                                            println "beforeSize:" + beforeSize + "B"
+                                            printlog "beforeSize:" + beforeSize + "B"
 
                                             // Use the Tinify API client
                                             def tSource = Tinify.fromFile("${filePathAndName}");
                                             tSource.toFile("${filePathAndName}");
 
                                             def afterSize = fis.available();
-                                            println "afterSize:" + afterSize + "B"
+                                            printlog "afterSize:" + afterSize + "B"
+
+
                                             def saveSize = beforeSize - afterSize
-                                            println "saveSize:" + saveSize + "B"
+                                            printlog("saveSize:" + saveSize + "B")
 
                                             thisTimeTotalSaveSize += saveSize
 
@@ -157,11 +179,13 @@ class TinyPicPlugin implements Plugin<Project> {
                     }
 
                     if (thisTimeTotalSaveSize.toInteger() == 0) {
-                        println "no need save"
+                        printlog "no need save"
+
                         return
                     }
                     def allTimesTotalSaveSize = thisTimeTotalSaveSize.toInteger() + lastAllTimesTotalSaveSize.toInteger()
-                    println "totalSaveSize>>>>>>>>>>>>>>>>>>>>>>" + thisTimeTotalSaveSize + "B"
+                    printlog "totalSaveSize>>>>>>>>>>>>>>>>>>>>>>" + thisTimeTotalSaveSize + "B"
+
                     compressedListFile << ">>>>>>>>>lastAllTimesTotalSaveSize>>>>>>>>>>:${lastAllTimesTotalSaveSize}" + "B" + " ${ln}"
                     compressedListFile << ">>>>>>>>>>>>>>this time totalSaveSize>>>>>>>>>>>>>>>:${thisTimeTotalSaveSize}" + "B" + " ${ln}"
                     compressedListFile << ">>>>>>>>>>>>>>>>>>>all times totalSaveSize>>>>>>>>>>>>>>>>>>>>:${allTimesTotalSaveSize}" + "B" + " ${ln}"
@@ -170,12 +194,18 @@ class TinyPicPlugin implements Plugin<Project> {
                 }
 
                 //将自定义task放在dx task之前执行
-                project.tasks.findByName(tinyPicPlugin).dependsOn dx.taskDependencies.getDependencies(dx)
-                dx.dependsOn project.tasks.findByName(tinyPicPlugin)
+                project.tasks.findByName(tinyPicPlugin).dependsOn processResourceTask.taskDependencies.getDependencies(processResourceTask)
+                processResourceTask.dependsOn project.tasks.findByName(tinyPicPlugin)
             }
 
         }
 
+    }
+
+    void printlog(String msg) {
+        if (tinyinfo.isShowLog == true) {
+            println msg
+        }
     }
 }
 
@@ -183,4 +213,8 @@ class TinyPicPlugin implements Plugin<Project> {
 class TinyInfo {
     String apiKey
     String maxNum
+
+
+    boolean skip
+    boolean isShowLog
 }
