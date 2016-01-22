@@ -4,6 +4,12 @@
 *Read this in other languages: [简体中文](README.zh-cn.md).*
 
 ## UpdateInfo
+### 1.1.4
+    add two new properties:
+    //if skpi the task
+    skip = true/false 
+    //if print log 
+    isShowLog = true/false
 ### 1.1.3.1
     rename packagename ,delete redundant code
 ### 1.1.3
@@ -27,8 +33,12 @@ add below code in the inner build.gradle file(which is in the same directory of 
  	apply plugin: 'tinyPIC'
 
  	tinyinfo {
-     	apiKey = 'your tiny API key'
- 	}
+                apiKey = 'your tiny API key'
+                //if skpi the task
+                skip = true/false 
+                //if print log 
+                isShowLog = true/false
+    }
  	
 ### Get tiny API key
 ***

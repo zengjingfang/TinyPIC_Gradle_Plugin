@@ -4,6 +4,13 @@
 *其他语言版本: [English](README.md).*
 
 ## 更新信息
+### 1.1.4
+    添加了新配置属性:
+    //是否跳过此task
+    skip = true/false 
+    //是否打印日志
+    isShowLog = true/false
+
 ### 1.1.3.1
     规范了目录结构，删除了冗余代码
 ### 1.1.3
@@ -21,16 +28,21 @@ tinyPIC是一个批量tiny处理res图片的gradle插件，以后您尽管往res
 ***
 在外层的build.gradle文件中（即与settings.gradle同级的文件）添加如下代码
 
- 	classpath 'com.mogujie.gradle:tinyPicPlugin:1.1.3'
+ 	    classpath 'com.mogujie.gradle:tinyPicPlugin:1.1.3'
+ 	
 在内层build.gradle文件中（即与src同级的文件）添加如下代码
 
 
 
- 	apply plugin: 'tinyPIC'
-
- 	tinyinfo {
-     	apiKey = '你申请的tiny API key'
- 	}
+ 	    apply plugin: 'tinyPIC'
+    
+        tinyinfo {
+            apiKey = '你申请的tiny API key'
+            //是否跳过此task
+            skip = true/false 
+            //是否打印日志
+            isShowLog = true/false
+        }
 
 
 

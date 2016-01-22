@@ -3,7 +3,6 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
-//        maven { url 'http://maven.mogujie.org/nexus/content/groups/mitpublic/'}
     }
 
     dependencies {
@@ -27,11 +26,11 @@ apply from: 'bintray.gradle'
 
 
 dependencies {
-  compile gradleApi()
-  compile localGroovy()
-  compile 'com.android.tools.build:gradle:1.1.0'
+    compile gradleApi()
+    compile localGroovy()
+    compile 'com.android.tools.build:gradle:1.1.0'
 
-  compile 'com.tinify:tinify:1.1.1'
+    compile 'com.tinify:tinify:1.1.1'
 }
 
 
